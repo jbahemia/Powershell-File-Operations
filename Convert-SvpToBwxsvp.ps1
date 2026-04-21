@@ -4,6 +4,7 @@
 
 # Prompt for input file only, auto-generate output file path
 $InputSvp = Read-Host "Enter path to .svp file"
+$InputSvp = $InputSvp.Trim('"')
 $OutputBwxsvp = [System.IO.Path]::ChangeExtension($InputSvp, ".bwxsvp")
 Write-Host ("Output will be written to: {0}" -f $OutputBwxsvp)
 
@@ -41,13 +42,14 @@ function Convert-DateTimeToEpoch {
 # Read all lines
 $lines = Get-Content $InputSvp
 
+
 # Prepare XML
-$xml = @()
-$xml += '<?xml version="1.0" encoding="UTF-8"?>'
-$xml += '<BeamworX>'
-$xml += '    <Format>SVPCollection</Format>'
-$xml += '    <Version>1.0</Version>'
-$xml += '    <Profiles>'
+$xmlOut = @()
+$xmlOut += '<?xml version="1.0" encoding="UTF-8"?>'
+$xmlOut += '<BeamworX>'
+$xmlOut += '    <Format>SVPCollection</Format>'
+$xmlOut += '    <Version>1.0</Version>'
+$xmlOut += '    <Profiles>'
 
 $profileId = 1
 for ($i = 0; $i -lt $lines.Count; $i++) {
@@ -63,12 +65,12 @@ for ($i = 0; $i -lt $lines.Count; $i++) {
         $lat = Convert-DmsToDecimal $latDms
         $lon = Convert-DmsToDecimal $lonDms
         $epoch = Convert-DateTimeToEpoch $yearDay $hms
-        $xml += ('        <SoundVelocityProfile ID="{0}" Name="Sound Velocity Profile" ContainsNonSV="false">' -f $profileId)
-        $xml += ('            <Position X="{0}" Y="{1}" Z="0.000"/>' -f $lon, $lat)
-        $xml += ('            <Time>{0}</Time>' -f $epoch)
-        $xml += ('            <Selected>true</Selected>')
-        $xml += ('            <PosIsWgs84>true</PosIsWgs84>')
-        $xml += ('            <Entries>')
+        $xmlOut += ('        <SoundVelocityProfile ID="{0}" Name="Sound Velocity Profile" ContainsNonSV="false">' -f $profileId)
+        $xmlOut += ('            <Position X="{0}" Y="{1}" Z="0.000"/>' -f $lon, $lat)
+        $xmlOut += ('            <Time>{0}</Time>' -f $epoch)
+        $xmlOut += ('            <Selected>true</Selected>')
+        $xmlOut += ('            <PosIsWgs84>true</PosIsWgs84>')
+        $xmlOut += ('            <Entries>')
         $profileId++
         # Read entries until next section or end
         $j = $i + 1
@@ -77,18 +79,19 @@ for ($i = 0; $i -lt $lines.Count; $i++) {
             if ($entry -match '^(\d+\.?\d*)\s+(\d+\.?\d*)') {
                 $depth = $matches[1]
                 $speed = $matches[2]
-                $xml += ('                <Entry Depth="{0}" Speed="{1}" Temp="0.000"/>' -f $depth, $speed)
+                $xmlOut += ('                <Entry Depth="{0}" Speed="{1}" Temp="0.000"/>' -f $depth, $speed)
             }
             $j++
         }
-        $xml += "            </Entries>"
-        $xml += "        </SoundVelocityProfile>"
+        $xmlOut += "            </Entries>"
+        $xmlOut += "        </SoundVelocityProfile>"
         $i = $j - 1
     }
 }
-$xml += '    </Profiles>'
-$xml += '</BeamworX>'
+
+$xmlOut += '    </Profiles>'
+$xmlOut += '</BeamworX>'
 
 # Write to output
-Set-Content -Path $OutputBwxsvp -Value $xml -Encoding UTF8
+Set-Content -Path $OutputBwxsvp -Value $xmlOut -Encoding UTF8
 Write-Host "Conversion complete: $OutputBwxsvp"
