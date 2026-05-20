@@ -23,7 +23,7 @@ This script automates a **QC stage of HIPP delivery** by comparing CARIS project
 - GSF files  
 
 ### How it works:
-- User points to a **parent folder** containing blocks (e.g. `A01`, `A02`, `A03`, etc.)
+- User points to a **parent folder** containing blocks (e.g. `A01`, `A02`, `A03`, etc.). Script will prompt user for each location sequentially
 - Matching is performed:
   - First by **folder name**
   - Then by **file/folder name**
