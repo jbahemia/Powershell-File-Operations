@@ -23,10 +23,12 @@ This script automates a **QC stage of HIPP delivery** by comparing CARIS project
 - GSF files  
 
 ### How it works:
-- User points to a **parent folder** containing blocks (e.g. `A01`, `A02`, `A03`, etc.). Script will prompt user for each location sequentially
+- User points to a **parent folder** containing blocks (e.g. `A01`, `A02`, `A03`, etc.).
+- Script will prompt user for each location sequentially, the AutoClean KMALL folder for instance would be "M:\Subsea\ProjectData\Current\13738\SI1058 - Year 1\07 Survey Data\Processed_Data\Autoclean KMALL\SOL"
 - Matching is performed:
   - First by **folder name**
   - Then by **file/folder name**
+- For the Trackline Folder item provide it the folder containing all projects, it will then go A01-TrackLines_A01 and then match the folder names in there to the other line items
 
 After running:
 - The user manually copies in:
